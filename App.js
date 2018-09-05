@@ -8,8 +8,8 @@
 'use strict'
 import React, {Component} from 'react';
 import {StyleSheet, Text, View, Button, Alert, Dimensions} from 'react-native';
-import { SketchCanvas } from '\@terrylinla/react-native-sketch-canvas';
-import { ColorPicker, toHsv } from 'react-native-color-picker'
+import {SketchCanvas} from '\@terrylinla/react-native-sketch-canvas';
+import {ColorPicker, toHsv} from 'react-native-color-picker'
 import Canvas from'./src/Canvas'
 import {createStore} from 'redux'
 import {Provider} from 'react-redux'
@@ -24,15 +24,16 @@ const reducer = (state = initialState, action) => {
   {
     case 'UNDO_DRAW':
       return(
-        { counter : state.counter - 1,
-          maxCounter : state.maxCounter}
+        { ...state,
+          counter : state.counter - 1}
       );
       break;
     case 'REDO_DRAW':
       return(
-        { counter : state.counter + 1,
-          maxCounter : state.maxCounter}
+        { ...state,
+          counter : state.counter + 1}
       );
+      break;
     case 'MAX_COUNTER':
       return(
         { counter : state.counter + 1,
@@ -45,11 +46,9 @@ const reducer = (state = initialState, action) => {
           }
     }
   }
-  return state;
 }
 
 const store = createStore(reducer);
-
 
 type Props = {};
 export default class App extends Component<Props> {

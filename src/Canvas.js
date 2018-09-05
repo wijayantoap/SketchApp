@@ -8,9 +8,11 @@
 'use strict'
 import React, {Component} from 'react';
 import {StyleSheet, Text, View, Button, Alert, Dimensions} from 'react-native';
-import { SketchCanvas } from '\@terrylinla/react-native-sketch-canvas';
-import { ColorPicker, toHsv } from 'react-native-color-picker'
+import {SketchCanvas } from '\@terrylinla/react-native-sketch-canvas';
+import {ColorPicker, toHsv} from 'react-native-color-picker'
 import {connect} from 'react-redux'
+
+let pathDrawer = [];
 
 type Props = {};
 class Canvas extends Component<Props> {
@@ -23,12 +25,14 @@ class Canvas extends Component<Props> {
       isHidden : false,
       buttonText : 'Change Color',
     }
-    this._onColorChange = this._onColorChange.bind(this)
+    this._onColorChange = this._onColorChange.bind(this);
+    this._draw = this._draw.bind(this);
+    this._undo = this._undo.bind(this);
+    this._redo = this._redo.bind(this);
   }
 
-
   _onColorChange(color) {
-    this.setState({ color })
+    this.setState({color});
   }
 
   _showPicker = () => {
@@ -51,14 +55,36 @@ class Canvas extends Component<Props> {
             style={{width:250, height:250}}
           />
       )
-      
     } else {
       return null;
     }
   }
 
-  _addPath() {
-    () => this.props.redoDraw();
+  _draw() {
+    this.props.calcMax();
+    let ctr = this.props.counter;
+    let ctrMax = this.props.maxCounter;
+    pathDrawer.splice(ctr, ctrMax);
+  }
+
+  _undo() {
+    if (this.props.counter > 1) {
+        //this.canvas.addPath(pathDrawer[]);
+        this.canvas.undo();
+        this.props.undoDraw();
+    } else if (this.props.counter < 2 && this.props.counter > 0) {
+        this.props.undoDraw();
+        this.canvas.clear();
+    }
+  }
+
+  _redo() {
+    let ctr = this.props.counter;
+    if (this.props.counter < this.props.maxCounter) {
+        this.canvas.addPath(pathDrawer[ctr]);
+        this.props.redoDraw();
+    } else {
+    }
   }
   
   render() {
@@ -66,7 +92,7 @@ class Canvas extends Component<Props> {
       <View style={styles.container}>
       <View style={styles.topView}>
           <Button
-            onPress={this.props.counter > 0 ? this.props.undoDraw : null}
+            onPress={this._undo}
             title={'<undo'}
             color={'red'}
           ></Button>
@@ -76,15 +102,18 @@ class Canvas extends Component<Props> {
             color={this.state.strokeColor}
           ></Button>
           <Button
-            onPress={this.props.counter < this.props.maxCounter ? this.props.redoDraw : null}
+            onPress={this._redo}
             title={'redo>'}
           ></Button>
       </View>
-      
-        <Text style={styles.pickerContainer}>Current state: {this.props.counter}</Text> 
-        <Text style={styles.pickerContainer}>Max state: {this.props.maxCounter}</Text> 
+        <Text style={styles.pickerContainer}  onPress={() => {
+            this.canvas.addPath(pathDrawer[1]);
+        }}>Current state: {this.props.counter}</Text> 
+        <Text style={styles.pickerContainer} onPress={() => {
+            this.canvas.clear();
+        }}>Max state: {this.props.maxCounter}</Text> 
         <View style={styles.pickerContainer}>
-        {this._renderCancel()}
+            {this._renderCancel()}
         </View>
         <View
           style={{
@@ -95,14 +124,15 @@ class Canvas extends Component<Props> {
         />
         <View style= {{ flex: 1, flexDirection: 'row'}}>
           <SketchCanvas
-          ref={ref => this.canvas = ref}
-          style={{ flex: 1}}
-          strokeColor={this.state.strokeColor}
-          strokeWidth={7}
-          onStrokeEnd={this.props.calcMax}
-          onPathsChange={(pathsCount) => {
-            console.log('pathsCount', pathsCount)
-          }}
+            ref={ref => this.canvas = ref}
+            style={{ flex: 1}}
+            strokeColor={this.state.strokeColor}
+            strokeWidth={7}
+            onStrokeStart={this._draw}
+            onStrokeEnd={(path) => {
+                pathDrawer.push(path)
+                console.log(path)
+            }}
           />
         </View>
       </View>
@@ -113,7 +143,8 @@ class Canvas extends Component<Props> {
 function mapStateToProps(state) {
     return {
         counter : state.counter,
-        maxCounter : state.maxCounter
+        maxCounter : state.maxCounter,
+        //pathDrawer : state.path
     }
 }
 
