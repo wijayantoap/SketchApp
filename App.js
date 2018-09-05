@@ -23,22 +23,30 @@ const reducer = (state = initialState, action) => {
   switch(action.type)
   {
     case 'UNDO_DRAW':
-    return(
-      { 
-      counter : state.counter - 1}
-    )
+      return(
+        { counter : state.counter - 1,
+          maxCounter : state.maxCounter}
+      );
+      break;
     case 'REDO_DRAW':
-    return(
-      { counter : state.counter + 1}
-    )
+      return(
+        { counter : state.counter + 1,
+          maxCounter : state.maxCounter}
+      );
     case 'MAX_COUNTER':
-    return(
-      { maxCounter : state.maxCounter + 1}
-    )
+      return(
+        { counter : state.counter + 1,
+          maxCounter : state.counter + 1}
+      );
+      break;
+        default: {
+          return {
+            ...state
+          }
+    }
   }
   return state;
 }
-
 
 const store = createStore(reducer);
 

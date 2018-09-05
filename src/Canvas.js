@@ -41,7 +41,6 @@ class Canvas extends Component<Props> {
   }
 
   _renderCancel() {
-    console.log("undo" + this.props.counter);
     if (this.state.isHidden) {
       return (
           <ColorPicker
@@ -77,12 +76,13 @@ class Canvas extends Component<Props> {
             color={this.state.strokeColor}
           ></Button>
           <Button
-            onPress={this.props.redoDraw}
+            onPress={this.props.counter < this.props.maxCounter ? this.props.redoDraw : null}
             title={'redo>'}
           ></Button>
       </View>
       
         <Text style={styles.pickerContainer}>Current state: {this.props.counter}</Text> 
+        <Text style={styles.pickerContainer}>Max state: {this.props.maxCounter}</Text> 
         <View style={styles.pickerContainer}>
         {this._renderCancel()}
         </View>
@@ -99,7 +99,7 @@ class Canvas extends Component<Props> {
           style={{ flex: 1}}
           strokeColor={this.state.strokeColor}
           strokeWidth={7}
-          onStrokeEnd={this.props.redoDraw}
+          onStrokeEnd={this.props.calcMax}
           onPathsChange={(pathsCount) => {
             console.log('pathsCount', pathsCount)
           }}
@@ -112,7 +112,8 @@ class Canvas extends Component<Props> {
 
 function mapStateToProps(state) {
     return {
-        counter : state.counter
+        counter : state.counter,
+        maxCounter : state.maxCounter
     }
 }
 
@@ -120,7 +121,7 @@ function mapDispatchToProps(dispatch) {
     return {
         undoDraw : () => dispatch({ type: 'UNDO_DRAW' }),
         redoDraw : () => dispatch({ type: 'REDO_DRAW' }),
-        maxCounter : () => dispatch({ type: 'MAX_COUNTER'})
+        calcMax : () => dispatch({ type: 'MAX_COUNTER'})
     }
 }
 
