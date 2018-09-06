@@ -18,7 +18,7 @@ react-native-color-picker (https://github.com/instea/react-native-color-picker)
 used for picking the color of the pen
 
 Redux (https://redux.js.org/)
-to save the history and the state of canvas -- notice that it is currently only saving the sketch counter based on the number of user's stroke stroke and the actions, meanwhile the path of the sketch is saved separately
+to save the history and the state of canvas -- notice that it is currently only saving the sketch counter based on the number of user's stroke and the actions, meanwhile the path of the sketch is saved separately
 
 Implementation
 -------------
