@@ -7,12 +7,17 @@
  */
 'use strict'
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Button, Alert, Dimensions} from 'react-native';
+import {StyleSheet, Text, View, Button, Alert, Dimensions, TouchableOpacity} from 'react-native';
 import {SketchCanvas } from '\@terrylinla/react-native-sketch-canvas';
 import {ColorPicker, toHsv} from 'react-native-color-picker'
 import {connect} from 'react-redux'
 
 let pathDrawer = [];
+let colorArr = [];
+
+while (colorArr.length < 5) {
+  colorArr.push("#" + Math.random().toString(16).slice(2,8));
+}
 
 type Props = {};
 class Canvas extends Component<Props> {
@@ -26,6 +31,8 @@ class Canvas extends Component<Props> {
       buttonText : 'Change Color',
     }
     this._onColorChange = this._onColorChange.bind(this);
+    this._newColorCHange = this._newColorCHange.bind(this);
+    this._changePicker = this._changePicker.bind(this);
     this._draw = this._draw.bind(this);
     this._undo = this._undo.bind(this);
     this._redo = this._redo.bind(this);
@@ -33,6 +40,11 @@ class Canvas extends Component<Props> {
 
   _onColorChange(color) {
     this.setState({color});
+  }
+
+  _newColorCHange(currentIndex) {
+    this.setState({strokeColor : currentIndex})
+    console.log(currentIndex);
   }
 
   _showPicker = () => {
@@ -44,8 +56,37 @@ class Canvas extends Component<Props> {
     }
   }
 
+  _changePicker(){
+    colorArr = [];
+    while (colorArr.length < 5) {
+      colorArr.push("#" + Math.random().toString(16).slice(2,8));
+    }
+    console.log("refresh " + colorArr);
+    this.setState({strokeColor : this.state.strokeColor});
+  }
+
+  _renderButtons = () => {
+    const buttons = [];
+
+    for (var i = 0; i < colorArr.length; i++) {
+      let currentIndex = colorArr[i];
+      buttons.push(
+        <Button 
+        buttonStyle={styles.button}
+        key={i}
+        title={colorArr[i]}
+        color={colorArr[i]}
+        onPress={() => this._newColorCHange(currentIndex)}
+        ></Button>
+      );
+    }
+    return buttons;
+  }
+
   _renderCancel() {
     if (this.state.isHidden) {
+      /*
+      // THIS IS A COLOR PICKER LIB
       return (
           <ColorPicker
             color={this.state.color}
@@ -54,7 +95,18 @@ class Canvas extends Component<Props> {
             onColorSelected={color => this.setState({strokeColor : color})}
             style={{width:250, height:250}}
           />
-      )
+      );
+      */
+      return(
+        <View>
+          <View style={styles.topView2}>
+            {this._renderButtons()}
+          </View>
+          <Button
+          title="Random Color"
+          onPress={() => this._changePicker()}></Button>
+        </View>
+      );
     } else {
       return null;
     }
@@ -69,7 +121,6 @@ class Canvas extends Component<Props> {
 
   _undo() {
     if (this.props.counter > 1) {
-        //this.canvas.addPath(pathDrawer[]);
         this.canvas.undo();
         this.props.undoDraw();
     } else if (this.props.counter < 2 && this.props.counter > 0) {
@@ -106,13 +157,15 @@ class Canvas extends Component<Props> {
             title={'redo>'}
           ></Button>
       </View>
+      {/*
         <Text style={styles.pickerContainer}  onPress={() => {
             this.canvas.addPath(pathDrawer[1]);
         }}>Current state: {this.props.counter}</Text> 
         <Text style={styles.pickerContainer} onPress={() => {
             this.canvas.clear();
         }}>Max state: {this.props.maxCounter}</Text> 
-        <View style={styles.pickerContainer}>
+      */}
+        <View>
             {this._renderCancel()}
         </View>
         <View
@@ -144,7 +197,6 @@ function mapStateToProps(state) {
     return {
         counter : state.counter,
         maxCounter : state.maxCounter,
-        //pathDrawer : state.path
     }
 }
 
@@ -167,8 +219,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  topView2: {
+    marginTop:10,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
   pickerContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-  }
+  },
 });
