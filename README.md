@@ -13,8 +13,9 @@ Features
 
 How it's done
 -------------
-random color picker
-create 5 buttons with random color that automatically generated.
+random color picker/button.
+
+automatically create 5 buttons with random color everytime the app is opened.
 the user can also refresh the color to create another random color to pick.
 after the user chose the color, it will assign the color to the state and `<SketchCanvas>` will automatically register the color and use it for drawing.
 ```
